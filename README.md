@@ -1,6 +1,6 @@
 # Manufacturing AX Dataset Tools
 
-> **제조 AI 데이터의 표준화된 메타데이터 생성부터 객체탐지 모델 평가까지 지원하는 데이터 활용 모듈**
+> **제조 AI 데이터의 표준화된 메타데이터 생성부터 AI 모델 평가까지 지원하는 데이터 활용 모듈**
 
 제조기업이 작성한 데이터 정보를 **MLCommons Croissant 1.1 표준**으로 변환하고, 생성된 Croissant Dataset을 기반으로 **AI 모델을 평가**할 수 있도록 구성한 Python 모듈 모음입니다.
 
