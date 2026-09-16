@@ -1,0 +1,379 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "containedIn": "cr:containedIn",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "dct": "http://purl.org/dc/terms/",
+    "equivalentProperty": "cr:equivalentProperty",
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileProperty": "cr:fileProperty",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "jsonPath": "cr:jsonPath",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "samplingRate": "cr:samplingRate",
+    "sc": "https://schema.org/",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "conformsTo": "http://mlcommons.org/croissant/1.1",
+  "name": "MAX_TR_DS01",
+  "alternateName": "트랜지스터 불량 검사 데이터",
+  "description": "트랜지스터 불량 여부 판별을 위한 학습 데이터",
+  "citeAs": "@misc{MAX_TR_DS01,\n  title  = {트랜지스터 불량 검사 데이터},\n  author = {MAX 추진단},\n  year   = {2026},\n  note   = {MAX_TR_DS01, version 1.0}\n}",
+  "version": "1.0",
+  "datePublished": "2026-09-07",
+  "keywords": [
+    "반도체",
+    "트랜지스터 제조 공정",
+    "Image",
+    "Object Detection"
+  ],
+  "license": "https://maxalliance.kr/license/license.html",
+  "creator": {
+    "@type": "sc:Organization",
+    "name": "MAX 추진단"
+  },
+  "isLiveDataset": true,
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "data-root-train",
+      "name": "data-root-train",
+      "description": "train 데이터 폴더",
+      "contentUrl": "MAX_TR_DS01/data/train",
+      "encodingFormat": "application/x-directory"
+    },
+    {
+      "@type": "cr:FileSet",
+      "@id": "data-train",
+      "name": "data-train",
+      "description": "train 데이터 파일",
+      "containedIn": {
+        "@id": "data-root-train"
+      },
+      "includes": "*.jpg",
+      "encodingFormat": "image/jpeg"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "labels-root-train",
+      "name": "labels-root-train",
+      "description": "train 라벨 폴더",
+      "contentUrl": "MAX_TR_DS01/labels/train",
+      "encodingFormat": "application/x-directory"
+    },
+    {
+      "@type": "cr:FileSet",
+      "@id": "labels-train",
+      "name": "labels-train",
+      "description": "train 라벨 파일 (YOLO TXT)",
+      "containedIn": {
+        "@id": "labels-root-train"
+      },
+      "includes": "*.txt",
+      "encodingFormat": "text/plain"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "data-root-test",
+      "name": "data-root-test",
+      "description": "test 데이터 폴더",
+      "contentUrl": "MAX_TR_DS01/data/test",
+      "encodingFormat": "application/x-directory"
+    },
+    {
+      "@type": "cr:FileSet",
+      "@id": "data-test",
+      "name": "data-test",
+      "description": "test 데이터 파일",
+      "containedIn": {
+        "@id": "data-root-test"
+      },
+      "includes": "*.jpg",
+      "encodingFormat": "image/jpeg"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "labels-root-test",
+      "name": "labels-root-test",
+      "description": "test 라벨 폴더",
+      "contentUrl": "MAX_TR_DS01/labels/test",
+      "encodingFormat": "application/x-directory"
+    },
+    {
+      "@type": "cr:FileSet",
+      "@id": "labels-test",
+      "name": "labels-test",
+      "description": "test 라벨 파일 (YOLO TXT)",
+      "containedIn": {
+        "@id": "labels-root-test"
+      },
+      "includes": "*.txt",
+      "encodingFormat": "text/plain"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "classes",
+      "name": "classes",
+      "description": "클래스 정의",
+      "dataType": "sc:Enumeration",
+      "key": {
+        "@id": "classes/id"
+      },
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "classes/id",
+          "name": "id",
+          "description": "클래스 인덱스",
+          "dataType": "sc:Integer"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "classes/name",
+          "name": "name",
+          "description": "클래스 이름",
+          "dataType": "sc:Text"
+        }
+      ],
+      "data": [
+        {
+          "classes/id": 0,
+          "classes/name": "bent"
+        },
+        {
+          "classes/id": 1,
+          "classes/name": "cut"
+        },
+        {
+          "classes/id": 2,
+          "classes/name": "damaged"
+        },
+        {
+          "classes/id": 3,
+          "classes/name": "misplaced"
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "splits",
+      "name": "splits",
+      "dataType": "cr:Split",
+      "key": {
+        "@id": "splits/name"
+      },
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "splits/name",
+          "name": "name",
+          "dataType": "sc:Text"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "splits/ratio",
+          "name": "ratio",
+          "dataType": "sc:Float"
+        }
+      ],
+      "data": [
+        {
+          "splits/name": "train",
+          "splits/ratio": 0.83
+        },
+        {
+          "splits/name": "test",
+          "splits/ratio": 0.17
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "data-records-train",
+      "name": "data-records-train",
+      "description": "train 데이터 예시",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "data-records-train/image",
+          "name": "image",
+          "description": "이미지",
+          "dataType": "sc:ImageObject",
+          "source": {
+            "fileSet": {
+              "@id": "data-train"
+            },
+            "extract": {
+              "fileProperty": "content"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "data-records-train/filename",
+          "name": "filename",
+          "description": "데이터 파일명(라벨 매핑 키)",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {
+              "@id": "data-train"
+            },
+            "extract": {
+              "fileProperty": "filename"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "labels-records-train",
+      "name": "labels-records-train",
+      "description": "train 라벨 파일(파일명+내용)",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "labels-records-train/filename",
+          "name": "filename",
+          "description": "라벨 파일명(데이터 매핑 키)",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {
+              "@id": "labels-train"
+            },
+            "extract": {
+              "fileProperty": "filename"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "labels-records-train/content",
+          "name": "content",
+          "description": "라벨 파일 내용(원본 텍스트)",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {
+              "@id": "labels-train"
+            },
+            "extract": {
+              "fileProperty": "content"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "data-records-test",
+      "name": "data-records-test",
+      "description": "test 데이터 예시",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "data-records-test/image",
+          "name": "image",
+          "description": "이미지",
+          "dataType": "sc:ImageObject",
+          "source": {
+            "fileSet": {
+              "@id": "data-test"
+            },
+            "extract": {
+              "fileProperty": "content"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "data-records-test/filename",
+          "name": "filename",
+          "description": "데이터 파일명(라벨 매핑 키)",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {
+              "@id": "data-test"
+            },
+            "extract": {
+              "fileProperty": "filename"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "labels-records-test",
+      "name": "labels-records-test",
+      "description": "test 라벨 파일(파일명+내용)",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "labels-records-test/filename",
+          "name": "filename",
+          "description": "라벨 파일명(데이터 매핑 키)",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {
+              "@id": "labels-test"
+            },
+            "extract": {
+              "fileProperty": "filename"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "labels-records-test/content",
+          "name": "content",
+          "description": "라벨 파일 내용(원본 텍스트)",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {
+              "@id": "labels-test"
+            },
+            "extract": {
+              "fileProperty": "content"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
