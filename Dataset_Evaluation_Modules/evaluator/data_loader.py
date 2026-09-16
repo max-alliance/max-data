@@ -4,8 +4,6 @@ import mlcroissant as mlc
 import numpy as np
 import tensorflow as tf
 
-from .parser.tabular_parser import CroissantTabularParser
-
 
 def _as_str(value):
     return value.decode() if isinstance(value, bytes) else value
@@ -101,63 +99,31 @@ def _get_record_set(ds, split):
     )
 
 
-def build_tabular_dataset(
-    jsonld_path,
-    split="train",
-    numeric_only=True,
-    exclude_fields=None,
-    parser=None,
-):
+def build_tabular_dataset(jsonld_path, split="train", numeric_only=True):
     """Croissant Dataset -> (X, y, feature_names).
-
-    Parser는 RecordSet/Field 구조 해석만 담당합니다. 기관/모델별 전처리는
-    이 함수 밖에서 수행해야 합니다.
+ 
+    record_set 이름은 관례상 'records-{split}' 또는 단일 파일이면 'records'.
     """
-    ds = mlc.Dataset(jsonld_path)
-    record_set = _get_record_set(ds, split)
+    _NUMERIC = {"Float", "Integer"}
+    
+    ds = mlc.Dataset(jsonld_path)                     # 경로가 맞으면 mapping 불필요
+ 
+    ids = {r.uuid for r in ds.metadata.record_sets}
+    record_set = f"records-{split}" if f"records-{split}" in ids else "records"
     rs = next(r for r in ds.metadata.record_sets if r.uuid == record_set)
-
+ 
     label_key = f"{record_set}/label"
-    if not any(f.uuid == label_key for f in rs.fields):
-        raise ValueError(f"RecordSet '{record_set}'에 label field가 없습니다: {label_key}")
+    feature_fields = [f for f in rs.fields if f.uuid != label_key]
+    if numeric_only:
+        def _is_numeric(field):
+            return any(str(t).split("/")[-1] in _NUMERIC for t in field.data_types)
 
-    if parser is None:
-        parser = CroissantTabularParser(
-            numeric_only=numeric_only,
-            exclude_fields=exclude_fields,
-        )
-
-    return parser.parse(ds, record_set, label_key, rs.fields)
-
-
-def load_csv_classification_dataset(
-    csv_path,
-    label_column="Pass/Fail",
-    feature_columns=None,
-    exclude_columns=("Time",),
-    dtype=np.float32,
-):
-    """Load a raw CSV classification dataset as (X, y, feature_names).
-
-    This is intentionally a thin I/O adapter. It does not perform imputation,
-    scaling, feature selection, or feature engineering; those remain external
-    to the common module and should be implemented in the institution Notebook
-    when required by the model.
-    """
-    import pandas as pd
-
-    df = pd.read_csv(csv_path)
-    if label_column not in df.columns:
-        raise ValueError(f"label_column '{label_column}'이 CSV 컬럼에 없습니다.")
-
-    if feature_columns is None:
-        excluded = set(exclude_columns or ()) | {label_column}
-        feature_columns = [column for column in df.columns if column not in excluded]
-
-    missing = [column for column in feature_columns if column not in df.columns]
-    if missing:
-        raise ValueError(f"CSV에 없는 feature column: {missing[:10]}")
-
-    X = df.loc[:, feature_columns].to_numpy(dtype=dtype)
-    y = df.loc[:, label_column].to_numpy()
-    return X, y, list(feature_columns)
+        feature_fields = [f for f in feature_fields if _is_numeric(f)]
+    feature_keys = [f.uuid for f in feature_fields]
+    feature_names = [k.split("/")[-1] for k in feature_keys]
+ 
+    X, y = [], []
+    for record in ds.records(record_set=record_set):
+        X.append([float("nan") if record[k] is None else record[k] for k in feature_keys])
+        y.append(record.get(label_key))
+    return np.asarray(X, dtype=np.float32), np.asarray(y), feature_names
