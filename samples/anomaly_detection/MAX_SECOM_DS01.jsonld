@@ -159,7 +159,7 @@
       "@type": "cr:RecordSet",
       "@id": "records-train",
       "name": "records-train",
-      "description": "train 데이터 레코드. 라벨('Pass/Fail')과 피처 591개 컬럼을 같은 행에서 추출한다.",
+      "description": "train 데이터 레코드. 라벨('Pass/Fail')과 피처 590개 컬럼(엑셀 셀 참조로 지정된)을 같은 행에서 추출한다.",
       "field": [
         {
           "@type": "cr:Field",
@@ -178,21 +178,6 @@
           "references": {
             "field": {
               "@id": "classes/id"
-            }
-          }
-        },
-        {
-          "@type": "cr:Field",
-          "@id": "records-train/Time",
-          "name": "Time",
-          "description": "피처 컬럼 'Time'",
-          "dataType": "sc:Text",
-          "source": {
-            "fileObject": {
-              "@id": "data-train"
-            },
-            "extract": {
-              "column": "Time"
             }
           }
         },
@@ -9052,7 +9037,7 @@
       "@type": "cr:RecordSet",
       "@id": "records-test",
       "name": "records-test",
-      "description": "test 데이터 레코드. 라벨('Pass/Fail')과 피처 591개 컬럼을 같은 행에서 추출한다.",
+      "description": "test 데이터 레코드. 라벨('Pass/Fail')과 피처 590개 컬럼(엑셀 셀 참조로 지정된)을 같은 행에서 추출한다.",
       "field": [
         {
           "@type": "cr:Field",
@@ -9071,21 +9056,6 @@
           "references": {
             "field": {
               "@id": "classes/id"
-            }
-          }
-        },
-        {
-          "@type": "cr:Field",
-          "@id": "records-test/Time",
-          "name": "Time",
-          "description": "피처 컬럼 'Time'",
-          "dataType": "sc:Text",
-          "source": {
-            "fileObject": {
-              "@id": "data-test"
-            },
-            "extract": {
-              "column": "Time"
             }
           }
         },
