@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<title>화면 구성 안내</title>
+<!--
+  README 그림 원본: docs/images/app_guide.png
+  스크린샷(app_screenshot.jpg) 위에 번호 배지·영역 표시·말풍선을 얹는다.
+  화면이 바뀌면 스크린샷을 교체하고 아래 AREAS 의 좌표(스크린샷 원본 픽셀 기준)만 고친 뒤
+  python docs/src/render.py app_guide.html
+-->
+<style>
+  :root{--ink:#171726;--muted:#5f6675;--line:#dfe2ea;--accent:#4f46e5;--accent-soft:#eef2ff}
+  html,body{margin:0;background:#fff}
+  #fig{position:relative;width:1440px;height:900px;background:#f4f5f9;
+       font-family:'Noto Sans CJK KR','Malgun Gothic',sans-serif;color:var(--ink);overflow:hidden}
+  #shot{position:absolute;left:270px;top:172px;width:900px;border-radius:8px;
+        box-shadow:0 10px 30px rgba(23,23,38,.18),0 0 0 1px rgba(23,23,38,.12)}
+  #ov{position:absolute;left:0;top:0;width:1440px;height:900px;pointer-events:none}
+  .card{position:absolute;background:#fff;border:1.5px solid var(--line);border-radius:12px;
+        padding:12px 14px 12px 14px;box-shadow:0 4px 14px rgba(23,23,38,.08)}
+  .card h3{margin:0;font-size:19px;font-weight:800;display:flex;align-items:center;gap:8px;line-height:1.25}
+  .card p{margin:5px 0 0;font-size:15.5px;line-height:1.45;color:#3a3f4f}
+  .num{flex:none;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;
+       border-radius:50%;background:var(--accent);color:#fff;font-size:14px;font-weight:800}
+  code{font-family:'DejaVu Sans Mono',Consolas,monospace;font-size:.92em;background:var(--accent-soft);
+       padding:0 4px;border-radius:4px}
+  /* 툴바 묶음 말풍선 */
+  #tb{position:absolute;left:20px;top:14px;width:1400px;height:112px;box-sizing:border-box;
+      background:#fff;border:1.5px solid var(--line);border-radius:14px;box-shadow:0 4px 14px rgba(23,23,38,.08);
+      display:grid;grid-template-columns:repeat(5,1fr);gap:0 18px;padding:12px 18px}
+  #tb .it h3{margin:0;font-size:18px;font-weight:800;display:flex;align-items:center;gap:7px}
+  #tb .it p{margin:5px 0 0;font-size:15px;line-height:1.42;color:#3a3f4f}
+  #tb .tag{position:absolute;left:18px;top:-11px;background:var(--ink);color:#fff;font-size:12px;
+           font-weight:800;letter-spacing:1px;padding:2px 9px;border-radius:999px}
+</style></head>
+<body>
+<div id="fig">
+  <img id="shot" src="app_screenshot.jpg" alt="">
+  <svg id="ov" viewBox="0 0 1440 900"></svg>
+
+  <div id="tb">
+    <span class="tag">툴바</span>
+    <div class="it"><h3><span class="num">1</span>예제 채우기</h3><p>SECOM 예제 값으로 모든 시트를 한 번에 채웁니다.</p></div>
+    <div class="it"><h3><span class="num">2</span>프로젝트 불러오기</h3><p>데이터가 든 상위(base) 폴더를 고르면 폴더 구조를 확인합니다.</p></div>
+    <div class="it"><h3><span class="num">3</span>초기화</h3><p>입력한 내용을 모두 지웁니다.</p></div>
+    <div class="it"><h3><span class="num">4</span>검증 실행</h3><p>입력값과 실제 데이터 파일을 검증하고 결과를 로그창에 보여 줍니다.</p></div>
+    <div class="it"><h3><span class="num">5</span>Croissant 변환</h3><p>통과하면 <code>.jsonld</code>와 검증확인서 PDF를 base 폴더에 저장합니다.</p></div>
+  </div>
+</div>
+
+<script>
+// 스크린샷 → 캔버스 좌표 변환 (원본 1537×985 를 폭 900 으로 축소)
+const SHOT = { x: 270, y: 172, k: 900 / 1537 }
+const P = (x, y) => [SHOT.x + x * SHOT.k, SHOT.y + y * SHOT.k]
+
+// 영역(스크린샷 원본 픽셀) · 배지 위치 · 말풍선
+const TOOLBAR = [ // 버튼별 배지 위치
+  [1, 67, 36], [2, 211, 36], [3, 352, 36], [4, 467, 36], [5, 603, 36],
+]
+const AREAS = [
+  { n: 6, box: [4, 96, 268, 955], badge: [136, 330],
+    card: { x: 18, y: 330, w: 226, title: '폴더 구조',
+      text: '불러온 폴더 트리와 기준 경로를 보여 주고, 필수 폴더 4개(raw · processed · annotations · AImodel)가 있는지 확인' } },
+  { n: 7, box: [288, 146, 1510, 728], badge: [1000, 160],
+    card: { x: 1192, y: 176, w: 232, title: '입력 시트',
+      text: '엑셀처럼 항목마다 \'입력\' 칸에 작성. <b style="color:#e11d48">*</b> 는 필수, 오류 칸은 빨갛게 표시' } },
+  { n: 9, box: [1163, 180, 1508, 728], badge: [1335, 700],
+    card: { x: 1192, y: 540, w: 232, title: '비고', text: '항목별 작성 안내와 입력 예시' } },
+  { n: 8, box: [748, 412, 1162, 511], badge: [1122, 432],
+    card: { x: 1192, y: 356, w: 232, title: '대상 업종 · 공정',
+      text: '업종을 고른 뒤 공정 선택. 업종›공정 1~5개, 선택 항목은 아래에 표시되고 × 로 삭제' } },
+  { n: 10, box: [276, 745, 978, 786], badge: [300, 765],
+    card: { x: 290, y: 780, w: 262, title: '시트 탭',
+      text: '5개 시트 전환. <b style="color:#f59e0b">●</b> 필수 미완료 · <b style="color:#e11d48">●</b> 오류' } },
+  { n: 11, box: [276, 788, 1528, 958], badge: [1000, 880],
+    card: { x: 574, y: 780, w: 300, title: '로그창',
+      text: '검증 · 변환 결과. <b style="color:#e11d48">오류</b> · <b style="color:#d97706">경고</b> · <b style="color:#059669">성공</b> 색으로 구분' } },
+  { n: 12, box: [2, 960, 1535, 983], badge: [1380, 971],
+    card: { x: 896, y: 780, w: 274, title: '상태바',
+      text: '데이터셋 ID와 필수 항목 진행률 (작성 중 / 작성 완료)' } },
+]
+
+const NS = 'http://www.w3.org/2000/svg'
+const ov = document.getElementById('ov')
+const fig = document.getElementById('fig')
+const ACC = '#4f46e5'
+function el(tag, attrs, parent = ov) {
+  const e = document.createElementNS(NS, tag)
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v)
+  parent.appendChild(e)
+  return e
+}
+function badge(n, cx, cy, r = 12) {
+  el('circle', { cx, cy, r: r + 2.5, fill: '#fff' })
+  el('circle', { cx, cy, r, fill: ACC })
+  const t = el('text', { x: cx, y: cy + 5, 'text-anchor': 'middle', fill: '#fff',
+    'font-size': 14, 'font-weight': 800, 'font-family': 'Noto Sans CJK KR, sans-serif' })
+  t.textContent = n
+}
+function outline([x1, y1, x2, y2]) {
+  const [a, b] = P(x1, y1), [c, d] = P(x2, y2)
+  el('rect', { x: a, y: b, width: c - a, height: d - b, rx: 5, fill: 'rgba(79,70,229,.05)',
+    stroke: ACC, 'stroke-width': 2, 'stroke-dasharray': '6 4' })
+}
+
+// 툴바: 영역 표시 + 말풍선 꼬리 + 버튼별 배지
+outline([8, 47, 668, 86])
+AREAS.forEach((a) => outline(a.box))
+
+// 말풍선 카드 + 지시선
+const cards = []
+AREAS.forEach((a) => {
+  const d = document.createElement('div')
+  d.className = 'card'
+  Object.assign(d.style, { left: a.card.x + 'px', top: a.card.y + 'px', width: a.card.w + 'px', boxSizing: 'border-box' })
+  d.innerHTML = `<h3><span class="num">${a.n}</span>${a.card.title}</h3><p>${a.card.text}</p>`
+  fig.appendChild(d)
+  cards.push([a, d])
+})
+requestAnimationFrame(() => {
+  for (const [a, d] of cards) {
+    const L = d.offsetLeft, T = d.offsetTop, R = L + d.offsetWidth, B = T + d.offsetHeight
+    const [bx, by] = P(...a.badge)
+    // 카드 테두리에서 배지 쪽으로 가장 가까운 점
+    let ax, ay
+    if (bx > R) { ax = R; ay = Math.min(Math.max(by, T + 18), B - 18) }
+    else if (bx < L) { ax = L; ay = Math.min(Math.max(by, T + 18), B - 18) }
+    else if (by < T) { ay = T; ax = Math.min(Math.max(bx, L + 18), R - 18) }
+    else { ay = B; ax = Math.min(Math.max(bx, L + 18), R - 18) }
+    el('line', { x1: ax, y1: ay, x2: bx, y2: by, stroke: ACC, 'stroke-width': 2 })
+    el('circle', { cx: ax, cy: ay, r: 3.5, fill: ACC })
+  }
+  // 배지는 선 위에
+  for (const [a] of cards) badge(a.n, ...P(...a.badge))
+  TOOLBAR.forEach(([n, x]) => {
+    const [bx] = P(x, 0), [, top] = P(0, 47)
+    el('line', { x1: bx, y1: 150, x2: bx, y2: top, stroke: ACC, 'stroke-width': 2 })
+    el('circle', { cx: bx, cy: top, r: 3.5, fill: ACC })
+    badge(n, bx, 148, 12)
+  })
+  document.body.dataset.ready = '1'
+})
+</script>
+</body></html>

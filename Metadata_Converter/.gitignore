@@ -1,0 +1,9 @@
+# 빌드 결과물 — 설치 파일(.exe)은 git 에 올리지 말고 GitHub Releases 에 첨부
+metadata_validator/release/
+metadata_validator/dist/
+metadata_validator/node_modules/
+backend/build/
+backend/dist/
+backend/*.spec
+__pycache__/
+*.pyc

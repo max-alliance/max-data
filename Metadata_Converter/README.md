@@ -1,208 +1,164 @@
-# Metadata Convertor
+# 제조데이터 제출 검증 도구
 
-제조기업이 작성한 Excel 데이터 제출 양식을 MLCommons Croissant 1.1 표준(JSON-LD)으로 변환하는 Python 도구입니다.
+M.AX 얼라이언스에 제출할 **제조 AI 데이터를 검사하고, 제출 파일을 만들어 주는** Windows 프로그램입니다.
 
-## 개요
+엑셀 양식처럼 생긴 화면에 데이터 정보를 입력하고 데이터 폴더를 선택하면, 빠진 항목이나 잘못된 파일이 없는지 검사합니다. 검사를 통과하면 제출에 필요한 파일 두 개를 자동으로 만들어 줍니다.
 
-Excel에 입력된 데이터셋 기본 정보, 데이터 경로, 라벨 정보, 데이터 분할(split) 정보를 읽어 Croissant 메타데이터를 생성합니다.
+- **`<데이터셋 ID>.jsonld`** — 데이터 설명서. 국제 표준 형식([Croissant](https://mlcommons.org/croissant/1.1))으로 저장됩니다.
+- **`제조데이터검증확인서.pdf`** — 검사를 통과했다는 확인서
 
-이미지처럼 라벨이 별도 파일로 있는 데이터와 CSV처럼 라벨이 컬럼으로 들어 있는 데이터를 모두 지원하며, 라벨과 데이터를 잇는 방식(`데이터-라벨 매핑 기준`)에 따라 구조를 다르게 생성합니다(아래 [데이터–라벨 매핑](#데이터라벨-매핑) 참고). 한 폴더에 여러 형식(예: `*.jpg, *.png`)이 섞여 있어도 함께 처리합니다.
+## 다운로드
 
-기업마다 제각각인 방식으로 관리되던 제조 AI 데이터를 Croissant 표준으로 통일해, 이후 검색·공유·학습·검증에 일관되게 활용하는 것이 목적입니다.
+[![최신 버전](https://img.shields.io/github/v/release/OWNER/REPO?label=%EC%B5%9C%EC%8B%A0%20%EB%B2%84%EC%A0%84)](https://github.com/OWNER/REPO/releases/latest)
 
-변환 전에 필수값·형식·데이터 경로를 검사하며, 문제가 있으면 파일을 만들지 않고 무엇을 어떻게 고쳐야 하는지 안내합니다(아래 [검증](#검증) 참고).
+**[⬇ 최신 버전 설치 파일 받기](https://github.com/OWNER/REPO/releases/latest)** — 페이지 아래 *Assets*에서 `metadata_validator-Setup-<버전>.exe`를 내려받으세요.
 
-## 동작 흐름
+- 이전 버전과 버전별 변경 내용: [전체 릴리스 목록](https://github.com/OWNER/REPO/releases)
+- Windows 10/11용입니다.
 
-```mermaid
-flowchart TD
-    A["제조기업 Excel 제출<br/>(template.xlsx)"] --> B["convert.py<br/>(읽기·검증·변환)"]
-    B -->|검증 통과| C["Croissant 1.1 JSON-LD"]
-    B -->|검증 실패| F["수정 안내 출력<br/>(파일 미생성)"]
-    C --> D["mlcroissant.Dataset() 로드·검증"]
-    D --> E["AI 데이터 활용·검증"]
+## 데이터 제출 흐름
+
+![M.AX 데이터 제출 체계](docs/images/max_submission_flow.png)
+
+1. **제출 기업**이 이 프로그램으로 데이터를 검사하고 제출 파일을 만듭니다.
+2. **M.AX 얼라이언스**가 업종별 제조 데이터를 같은 형식으로 모읍니다.
+3. **AI 개발자**가 모인 데이터를 내려받아 AI 학습에 씁니다.
+
+## 사용 방법
+
+1. **설치** — [다운로드](#다운로드)에서 받은 `metadata_validator-Setup-<버전>.exe`를 실행합니다. 새 버전을 설치할 때는 이전 버전을 지우지 않아도 됩니다.
+2. **데이터 폴더 준비** — 아래 [데이터 폴더 준비](#데이터-폴더-준비)대로 폴더를 정리합니다.
+3. **프로젝트 불러오기** — 데이터가 들어 있는 폴더를 선택합니다.
+4. **내용 입력** — 아래쪽 탭 5개(기본정보 · 데이터 정보 · 라벨 정보 · 데이터 스플릿 정보 · AI 모델 정보)를 차례로 채웁니다. 처음이라면 **예제 채우기**를 눌러 작성 예시를 먼저 보세요.
+5. **검증 실행** — 로그창에 빨간 글씨(오류)가 없어질 때까지 고칩니다.
+6. **Croissant 변환** — 제출 파일 두 개가 데이터 폴더에 저장됩니다.
+
+## 화면 구성
+
+![화면 구성](docs/images/app_guide.png)
+
+## 데이터 폴더 준비
+
+선택할 폴더 안에 아래 **4개 폴더가 모두** 있어야 합니다.
+
+```
+내 데이터 폴더/
+├── raw/            원본 데이터
+├── processed/      학습용으로 정리한 데이터
+│   ├── train/      학습용 (필수)
+│   ├── validation/ 검증용 (선택)
+│   └── test/       평가용 (필수)
+├── annotations/    라벨 파일
+└── AImodel/        학습한 AI 모델
 ```
 
-## 설치
+- 입력 화면의 '데이터 경로'에는 이 폴더 기준으로 `./processed`, `./annotations`처럼 적습니다.
+- 표(CSV) 파일은 **첫 줄이 컬럼 이름**이어야 합니다.
 
-Python 3.10 이상을 권장합니다.
+## 입력할 때 알아둘 점
+
+- **`*` 표시**가 있는 항목은 꼭 채워야 합니다. 각 항목의 **비고** 칸에 작성 예시가 있습니다.
+- **데이터셋 ID**는 영문·숫자·`-`·`_`·`.`만 쓸 수 있습니다. (예: `MAX_SECOM_DS01`)
+- **대상 업종·공정**은 업종을 먼저 고른 뒤 공정을 고릅니다. 1~5개까지 고를 수 있습니다.
+- **데이터 유형**은 현재 Image, Tabular(표) 두 가지를 지원합니다.
+- **Tabular 데이터**는 '입력(Feature) 컬럼'에 학습에 쓸 컬럼을 엑셀 셀 주소로 적습니다. (예: `B1:VS1`)
+- **스플릿 비율**은 0~1 사이 숫자로, 합이 1이 되게 적습니다. (예: 학습 0.8, 테스트 0.2)
+- **데이터-라벨 매핑 기준**은 라벨이 어디에 있는지에 따라 고릅니다.
+
+  | 선택 | 이럴 때 | 예시 |
+  |------|---------|------|
+  | `column` | 라벨이 데이터 표 안의 한 컬럼일 때 | CSV의 `Pass/Fail` 컬럼 |
+  | `filename` | 데이터 파일과 라벨 파일의 이름이 같을 때 | `a.jpg` ↔ `a.txt` |
+  | `id/key` | 데이터 표와 라벨 표가 따로 있고, 같은 ID 컬럼으로 연결될 때 | 두 표 모두 `id` 컬럼 |
+  | `index` | 순서로만 짝이 맞을 때 (1번째 ↔ 1번째) | 순서대로 저장된 데이터·라벨 |
+
+  `column`이나 `id/key`를 고르면 '라벨 컬럼'에 실제 컬럼 이름을 정확히 적어야 합니다.
+
+## 검증 결과 보는 법
+
+**검증 실행**을 누르면 결과가 아래쪽 로그창에 나옵니다.
+
+- **빨간 글씨(오류)**: 고쳐야 제출 파일이 만들어집니다. 문제가 있는 칸도 빨갛게 표시됩니다.
+- **노란 글씨(경고)**: 제출 파일은 만들어지지만, 한 번 확인해 보세요.
+
+자주 나오는 오류:
+
+| 오류 | 고치는 방법 |
+|------|------------|
+| 필수 폴더 누락 | 데이터 폴더에 `raw`, `processed`, `annotations`, `AImodel` 폴더를 만듭니다. |
+| 파일이 없습니다 | 데이터 경로와 스플릿 폴더(`train`, `test`)에 파일이 있는지, 파일 패턴(`*.csv` 등)이 맞는지 확인합니다. |
+| 필수 항목입니다 | `*` 표시 항목을 채웁니다. 아래 탭의 노란 점이 미완료 시트입니다. |
+| 라벨 컬럼이 헤더에 없습니다 | '라벨 컬럼'을 CSV 첫 줄의 컬럼 이름과 똑같이 적습니다. |
+| 라벨 값이 선언한 클래스와 다릅니다 | '클래스 분류'에 실제 데이터의 라벨 값을 모두 적습니다. (예: `-1 : Pass`, `1 : Fail`) |
+| 비율이 숫자가 아닙니다 | 스플릿 비율을 `0.8`처럼 숫자로 적습니다. |
+
+## 제출 파일
+
+**Croissant 변환**을 누르면 선택한 데이터 폴더에 두 파일이 저장됩니다. 다시 변환하면 새 파일로 바뀝니다.
+
+| 파일 | 내용 |
+|------|------|
+| `<데이터셋 ID>.jsonld` | 데이터 설명서 (예: `MAX_SECOM_DS01.jsonld`) |
+| `제조데이터검증확인서.pdf` | 입력 정보, 폴더별 파일 수·용량, 검사 결과를 담은 A4 한 장짜리 확인서 |
+
+- 확인서 번호와 직인 칸은 비워서 발급됩니다.
+- 확인서 PDF를 열어 둔 채로 변환하면 저장되지 않습니다. PDF를 닫고 다시 누르세요.
+
+---
+
+## 개발자용
+
+자세한 구조와 수정 방법은 [`HANDOFF.md`](HANDOFF.md)를 참고하세요.
+
+```
+metadata_validator/   화면 (React + Electron)
+backend/              검사·변환 엔진 (Python)
+docs/                 README 그림
+```
+
+**개발 실행**
 
 ```bash
-pip install openpyxl mlcroissant
+cd backend && pip install -r requirements.txt
+cd ../metadata_validator && npm install
+npm run electron:dev
 ```
 
-`requirements.txt`가 있다면:
+**설치 파일 만들기** (Windows)
 
 ```bash
-pip install -r requirements.txt
+cd backend
+pyinstaller --noconfirm --name engine --onedir --add-data "template.xlsx;." --add-data "certificate_template.html;." run_server.py
+cd ../metadata_validator
+npm run electron:build      # → release/metadata_validator-Setup-<버전>.exe
 ```
 
-> 변환 자체에는 `openpyxl`만 필요합니다. `mlcroissant`는 생성된 결과를 로드·검증하는 단계에서만 사용됩니다.
+**새 버전 배포하기** — 설치 파일은 git에 올리지 않고 GitHub **Releases**에 첨부합니다. README의 다운로드 링크는 항상 최신 릴리스를 가리키므로 고칠 필요가 없습니다.
 
-## 사용법
+1. `metadata_validator/package.json`의 `"version"`을 올립니다. (예: `0.1.0` → `0.2.0`) 설치 파일 이름, 앱 버전, 확인서에 찍히는 버전이 모두 이 값을 따릅니다.
+2. 위 **설치 파일 만들기**로 빌드합니다.
+3. GitHub 저장소 → **Releases** → **Draft a new release**
+   - **Choose a tag**: `v0.2.0` 입력 → *Create new tag*
+   - **Release title**: `v0.2.0`
+   - **설명**: 바뀐 내용 (예: "대상 업종·공정 목록 갱신")
+   - **Attach binaries**: `release/metadata_validator-Setup-0.2.0.exe` 끌어다 놓기
+4. **Publish release**를 누릅니다.
 
-기본값으로 실행하면 현재 폴더의 `template.xlsx`를 읽어, 데이터셋 ID를 파일명으로 한 JSON-LD(예: `MAX_TR_DS01.jsonld`)를 생성합니다. `-o`로 경로를 직접 지정할 수도 있습니다.
+GitHub CLI를 쓰면 한 줄로 할 수 있습니다.
 
 ```bash
-python convert.py
+gh release create v0.2.0 "release/metadata_validator-Setup-0.2.0.exe" --title "v0.2.0" --notes "바뀐 내용"
 ```
 
-입력·출력을 직접 지정하려면:
+**업종·공정 목록 바꾸기** — `backend/tools/industries.xlsx`를 고친 뒤 아래 명령을 실행하고, 설치 파일을 다시 만듭니다.
 
 ```bash
-python convert.py -i template.xlsx -o MAX_TR_DS01.jsonld
+cd backend
+python tools/build_industries.py
 ```
-
-데이터 파일 존재 여부는 **엑셀 정보로 자동 검사**합니다. `01_데이터 정보`·`02_라벨 정보`의 데이터 경로와 `03_데이터 스플릿 정보`의 스플릿을 합쳐 실제 경로(예: `./MAX_SECOM_DS01/data/train/`)를 만들고, 그 위치에 파일이 있는지 확인합니다. 기준 폴더는 **현재 작업 폴더 또는 엑셀 파일이 있는 폴더**에서 자동으로 찾으므로, 보통은 데이터 폴더가 있는 곳에서 그냥 실행하면 됩니다.
-
-```bash
-# 데이터 폴더(예: ./MAX_SECOM_DS01/...)가 있는 위치에서 실행 → 자동 검증
-python convert.py -i MAX_SECOM_DS01.xlsx
-```
-
-데이터가 다른 곳에 있으면 상위 폴더만 `-d`로 지정하고(선택), 데이터 없이 메타데이터만 만들려면 `--no-verify`를 씁니다.
-
-```bash
-python convert.py -i MAX_SECOM_DS01.xlsx -d /data/root   # 데이터 상위 폴더 지정(선택)
-python convert.py -i MAX_SECOM_DS01.xlsx --no-verify     # 파일 검사 건너뛰기
-```
-
-| 인자 | 설명 | 기본값 |
-|------|------|--------|
-| `-i`, `--input` | 변환할 Excel 제출 양식 | `template.xlsx` |
-| `-o`, `--output` | 출력 JSON-LD 파일 경로 | 데이터셋 ID (예: `MAX_TR_DS01.jsonld`) |
-| `-d`, `--base-dir` | 데이터가 들어 있는 **상위 폴더**(선택). 미지정 시 현재 폴더 또는 엑셀 파일 폴더에서 자동 탐색 | 자동 탐색 |
-| `--no-verify` | 실제 파일 존재 여부 검사를 건너뜀(메타데이터만 생성) | 꺼짐(검사 수행) |
-
-## 검증
-
-변환 직전에 다음을 검사합니다. **ERROR가 하나라도 있으면 출력 파일을 만들지 않고** 무엇을 고쳐야 하는지 항목별로 안내한 뒤 종료 코드 `1`을 반환합니다. WARNING만 있으면 파일은 생성하되 주의사항을 함께 출력합니다.
-
-ERROR (파일 미생성):
-
-- Excel의 `필수 여부`가 `Y`인 항목의 `입력`이 비어 있는 경우
-- 데이터셋 ID에 공백·특수문자가 있거나 255자를 초과하는 경우 (허용: 영문/숫자/`-`/`_`/`.`)
-- 파일 패턴이 `*.확장자` 형식이 아닌 경우 (여러 형식은 콤마로 구분, 예: `*.jpg, *.png`)
-- `데이터-라벨 매핑 기준`이 `column`·`filename`·`id/key`·`index` 외의 값인 경우
-- 매핑 기준이 `column` 또는 `id/key`인데 `라벨 컬럼`이 비어 있는 경우
-- 스플릿 비율이 숫자가 아니거나 0~1 범위를 벗어난 경우
-- 엑셀의 데이터 경로 폴더를 (현재 폴더·엑셀 폴더·`-d` 어디에서도) 찾지 못한 경우
-- `데이터 경로 + 스플릿`으로 만든 경로에 패턴에 해당하는 파일/폴더가 하나도 없는 경우 (`--no-verify` 시 제외)
-
-WARNING (파일은 생성):
-
-- 파일 확장자를 인식하지 못하는 경우
-- `데이터-라벨 매핑 기준`이 비어 있어 파일명(`filename`) 기반으로 간주한 경우
-- 매핑 기준이 `filename`·`index`인데 `라벨 컬럼`이 채워져 있는 경우
-- 매핑 기준이 `index`(저장 순서 기반)라 재정렬 시 매핑이 깨질 수 있는 경우
-- 매핑 기준이 `column`인데 데이터 파일 패턴이 표(csv/tsv/parquet) 형식이 아닌 경우
-- `column`/`id/key` 매핑에서 한 스플릿 폴더에 표 파일이 여러 개 있어 첫 파일만 사용한 경우
-- 표 파일을 찾지 못해 경로를 패턴 그대로 넣은 경우(실제 파일명으로 대체 필요)
-- 스플릿 비율의 합이 1이 아닌 경우
-- 생성일이 `YYYY-MM-DD` 형식이 아닌 경우
-- `클래스 수`와 실제 클래스 분류 개수가 다른 경우
-- `--no-verify`로 파일 존재 여부 검사를 건너뛴 경우
-
-종료 코드: `0` 성공 · `1` 검증 실패로 미생성 · `2` 입력 파일 없음. CI·파이프라인에서 그대로 활용할 수 있습니다.
-
-출력 예시:
-
-```
-❌ 다음 문제 때문에 metadata.jsonld 를 생성하지 않았습니다. 수정 후 다시 실행해 주세요:
-
-   - [기본정보] '설명' 은(는) 필수 항목입니다. → '입력' 열에 값을 채워주세요.
-   - [03_데이터 스플릿 정보] train 비율 'abc' 이(가) 숫자가 아닙니다. → 0~1 사이 숫자로 입력하세요 (예: 0.83).
-
-총 2개 항목을 수정해야 합니다.
-```
-
-## 데이터–라벨 매핑
-
-라벨이 데이터와 **어떻게 짝지어지는지**(`02_라벨 정보` 시트의 `데이터-라벨 매핑 기준`)에 따라 생성되는 Croissant 구조가 달라집니다. 네 가지를 지원합니다.
-
-| 매핑 기준 | 의미 | 생성 구조 | 예시 |
-|-----------|------|-----------|------|
-| `column` | 라벨이 데이터와 같은 행(레코드) 안 컬럼에 있음(조인 불필요) | 스플릿별 표 파일(FileObject)에서 `라벨 컬럼`을 추출하는 필드 | SECOM CSV의 `Pass/Fail` 컬럼 |
-| `filename` | 데이터 파일명으로 라벨 파일을 찾음 | 데이터·라벨을 각각 FileSet으로 만들고 파일명으로 매핑 | 이미지 `a.jpg` ↔ 라벨 `a.txt` |
-| `id/key` | 명시적 식별자 컬럼으로 두 테이블을 조인 | `column`과 동일하게 라벨 컬럼을 추출(조인 키는 학습 코드에서 지정) | ID로 연결된 별도 라벨 테이블 |
-| `index` | 저장 순서(i번째↔i번째)로 매칭 | `filename`과 동일한 파일 기반 구조 | 순서만 맞춘 데이터/라벨 |
-
-- `라벨 컬럼`은 `column`·`id/key`일 때 **필수**이고, `filename`·`index`일 때는 공란입니다.
-- 클래스 인덱스는 음수(예: `-1: Pass`)도 지원합니다. 클래스 ID가 모두 정수면 정수형, 아니면 문자열형으로 기술합니다.
-- `index`는 데이터나 라벨을 재정렬하면 매핑이 깨지므로, 재현성을 위해 로더의 정렬 기준을 고정해야 합니다.
-- `id/key`는 현재 템플릿에 조인 키 컬럼 칸이 없어 라벨 컬럼만 추출하고, 조인 키는 학습 코드에서 지정하도록 안내(WARNING)합니다.
-
-## 변환 범위
-
-| Excel 시트 | Croissant 매핑 |
-|------------|----------------|
-| 기본정보 | `name`, `alternateName`, `description`, `version`, `datePublished`, `keywords`, `creator`, `license`, `url`, `citeAs` |
-| 01_데이터 정보 · 02_라벨 정보 | `distribution` — 매핑 기준에 따라 스플릿별 데이터/라벨 FileSet(`filename`·`index`) 또는 스플릿별 데이터 FileObject(`column`·`id/key`) |
-| 02_라벨 정보(클래스 분류) | `recordSet` — 클래스 enumeration |
-| 03_데이터 스플릿 정보 | `recordSet` — split enumeration + 스플릿별 경로 |
-| 04_AI 모델 정보 | 제외 (Croissant는 데이터셋을 기술하는 포맷이라 모델 정보는 대상이 아님) |
-
-참고 사항:
-
-- `license`와 `url`은 코드 상단 상수(`LICENSE_URL`, `URL_TEMPLATE`)로 지정되며, 필요 시 그 값만 바꾸면 됩니다.
-- `citeAs`(인용정보)는 Excel에 없으므로 제출기업·데이터셋 명·버전·ID·생성연도로 BibTeX 형태를 자동 생성합니다.
-- `파일 패턴`에 여러 형식을 함께 적으면(예: `*.jpg, *.png`) 하나의 FileSet이 그 형식들을 모두 포함합니다.
-- 데이터는 오프라인 파일시스템에 loose 파일로 두어도 됩니다. 각 스플릿 폴더를 디렉토리 FileObject로 참조하고 그 안에서 패턴으로 파일을 모으며, 별도 압축(zip)이나 해시 없이 동작합니다(메타데이터에 `isLiveDataset: true`를 넣어 해시 없는 로컬 파일도 검증을 통과함).
-- 실제 파일 경로는 `데이터 경로 + 스플릿 하위폴더`(예: `MAX_SECOM_DS01/data/train/`)로 만들어 검사합니다. 별도 플래그 없이도 현재 폴더나 엑셀 파일 폴더를 기준으로 자동 탐색합니다.
-- `column`/`id/key` 매핑에서 스플릿이 여러 개면 스플릿별 표 파일을 각각 FileObject로 만들고 스플릿별 레코드셋에서 라벨 컬럼을 추출합니다. `-d`(또는 자동 탐색)로 데이터를 찾으면 실제 파일명까지 채워 넣습니다.
-- 검증 데이터(validation)는 선택 항목이라, 03 시트에 값이 없으면 해당 스플릿은 생성하지 않고 train/test만 만듭니다.
-
-## 출력 확인
-
-생성된 파일은 `mlcroissant`로 바로 로드·검증할 수 있습니다.
-
-```python
-import mlcroissant as mlc
-
-dataset = mlc.Dataset("metadata.jsonld")
-print(dataset.metadata.to_json())
-```
-
-레코드 단위로 데이터를 읽으려면 `dataset.records(record_set=...)`를 순회하면 되고, 이를 `tf.data.Dataset.from_generator(...)`나 PyTorch `IterableDataset`로 감싸 학습에 사용할 수 있습니다. 여러 record set을 잇달아 읽을 때는, `mlcroissant`가 내부 연산 그래프를 재사용하며 오류가 나는 경우가 있어 record set마다 `Dataset` 객체를 새로 만드는 것이 안전합니다.
-
-## 라이선스
-
-모든 데이터셋의 라이선스는 아래 주소로 동일하게 적용됩니다.
-
-https://maxalliance.kr/license/license.html
 
 ## 문의
 
 M.AX 얼라이언스 추진단 — max@keit.or.kr
 
----
-
-## 별첨. Croissant 포맷
-
-### 무엇인가
-
-Croissant는 머신러닝 데이터셋을 기술하기 위한 메타데이터 포맷입니다. 이미지, CSV, 텍스트 등 데이터 자체의 형식은 그대로 두고, 데이터셋의 구조와 의미를 설명하는 메타데이터 계층을 위에 얹는 방식으로 동작합니다. 웹 구조화 데이터 표준인 schema.org를 확장했으며, JSON-LD로 표현됩니다.
-
-### 누가 만들었나
-
-MLCommons 커뮤니티 워킹 그룹이 개발해 2024년 3월에 1.0을 공개했습니다. 초기 개발은 Google의 Dataset Search, Kaggle, TensorFlow Datasets 팀이 주도했고, 이후 Hugging Face, Meta, NASA, Harvard, Bayer, TU Eindhoven, Open Data Institute 등 산업계·학계가 함께 참여했습니다.
-
-### 왜 쓰는가
-
-기존 데이터셋을 재사용할 때 실무자는 데이터가 어떻게 구성돼 있는지 파악하고 어떤 부분을 학습에 쓸지 판단하는 데 상당한 시간을 씁니다. 데이터셋마다 구조와 문서화 방식이 다르기 때문입니다. Croissant는 이 표현 방식을 하나로 통일해 데이터를 찾고 이해하고 로드하는 비용을 줄입니다.
-
-주요 이점은 다음과 같습니다.
-
-- **발견 가능성** — schema.org 기반이라 Google Dataset Search 등에서 검색·색인이 쉽습니다.
-- **이식성** — 데이터를 재포맷하지 않고 여러 플랫폼으로 옮길 수 있습니다.
-- **상호운용성** — TensorFlow, PyTorch, JAX 등 주요 프레임워크에서 동일하게 로드됩니다.
-- **문서화 표준화** — 데이터셋의 내용, 출처, 사용 제한을 일관된 방식으로 기술합니다.
-- **책임 있는 AI** — 투명성·감사에 필요한 정보를 표준적으로 담아 AI 규제 대응에 유리합니다.
-
-Hugging Face, Kaggle, OpenML, Google Dataset Search 등 주요 저장소가 지원하며, NeurIPS Datasets and Benchmarks Track에서 권장 데이터 아티팩트로 채택되었습니다.
-
-### 참고
-
-- MLCommons Croissant: https://mlcommons.org/working-groups/data/croissant/
-- GitHub: https://github.com/mlcommons/croissant
-- 명세(1.1): https://mlcommons.org/croissant/1.1
+데이터 라이선스: https://maxalliance.kr/license/license.html

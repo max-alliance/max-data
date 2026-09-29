@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<title>M.AX 데이터 제출 체계</title>
+<!--
+  README 그림 원본: docs/images/max_submission_flow.png
+  수정 후 다시 그리기:  python docs/src/render.py
+  구성은 MLCommons Croissant 소개 그림(제작-저장소-활용 3원)을 M.AX 제출 체계로 옮긴 것.
+  타사 로고·Croissant 마스코트는 쓰지 않고 텍스트/일반 아이콘만 사용.
+-->
+<style>
+  html,body{margin:0;background:#fff}
+  svg{display:block;font-family:'Noto Sans CJK KR','Malgun Gothic',sans-serif}
+  .ink{fill:#171726}.muted{fill:#5f6675}.navy{fill:#1e3a8a}.indigo{fill:#4f46e5}
+  .ring{fill:#fff;stroke:#171726;stroke-width:5}
+  .bubble{fill:#fff;stroke:#171726;stroke-width:2;stroke-dasharray:8 7}
+  .flow{fill:none;stroke:#171726;stroke-width:2.4}
+  .thin{fill:none;stroke:#171726;stroke-width:1.6}
+  .chip{stroke:#171726;stroke-width:1.2}
+  .mono{font-family:'DejaVu Sans Mono',Consolas,monospace}
+</style></head>
+<body>
+<svg id="fig" width="1200" height="1480" viewBox="0 0 1200 1480" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="ah" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="11" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" fill="#171726"/>
+    </marker>
+    <clipPath id="c1"><circle cx="0" cy="0" r="300"/></clipPath>
+    <!-- 문서 아이콘 -->
+    <symbol id="doc" viewBox="0 0 24 30"><path d="M2 1h13l7 7v21H2z" fill="#fff" stroke="#171726" stroke-width="1.8"/><path d="M15 1v7h7" fill="none" stroke="#171726" stroke-width="1.8"/></symbol>
+    <symbol id="folder" viewBox="0 0 24 20"><path d="M1 3h8l2 3h12v13H1z" fill="#eef2ff" stroke="#1e3a8a" stroke-width="1.6"/></symbol>
+  </defs>
+
+  <!-- ─── 점선 설명 풍선 (원 뒤) ─── -->
+  <circle class="bubble" cx="850" cy="175" r="145"/>
+  <circle class="bubble" cx="1055" cy="435" r="130"/>
+  <circle class="bubble" cx="860" cy="1300" r="150"/>
+
+  <!-- ─── 큰 원 3개 ─── -->
+  <circle class="ring" cx="380" cy="350" r="300"/>
+  <circle class="ring" cx="820" cy="755" r="300"/>
+  <circle class="ring" cx="380" cy="1160" r="300"/>
+
+  <!-- 원 가장자리의 검은 띠(제목) : 원 중심 기준 회전 후 원으로 잘라낸 사각형 -->
+  <g transform="translate(380,350) rotate(-35)">
+    <g clip-path="url(#c1)"><rect x="226" y="-300" width="100" height="600" fill="#171726"/></g>
+    <text transform="translate(265,0) rotate(90)" text-anchor="middle" fill="#fff" font-size="21" font-weight="800">제출 기업</text>
+    <text transform="translate(243,0) rotate(90)" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" letter-spacing="2">SUBMITTERS</text>
+  </g>
+  <g transform="translate(820,755) rotate(-42)">
+    <g clip-path="url(#c1)"><rect x="226" y="-300" width="100" height="600" fill="#171726"/></g>
+    <text transform="translate(265,0) rotate(90)" text-anchor="middle" fill="#fff" font-size="21" font-weight="800">M.AX 얼라이언스</text>
+    <text transform="translate(243,0) rotate(90)" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" letter-spacing="2">MANUFACTURING AX</text>
+  </g>
+  <g transform="translate(380,1160) rotate(35)">
+    <g clip-path="url(#c1)"><rect x="226" y="-300" width="100" height="600" fill="#171726"/></g>
+    <text transform="translate(254,0) rotate(-90)" text-anchor="middle" fill="#fff" font-size="21" font-weight="800">데이터 활용</text>
+    <text transform="translate(276,0) rotate(-90)" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" letter-spacing="2">AI DEVELOPERS</text>
+  </g>
+
+  <!-- ─── 풍선 문구 ─── -->
+  <g font-size="19" font-style="italic" text-anchor="middle" class="ink">
+    <text x="850" y="120">제출 검증 도구에서</text>
+    <text x="850" y="148">메타데이터를 입력하고</text>
+    <text x="850" y="176">폴더·파일을 검증해</text>
+    <text x="850" y="204">Croissant 변환과</text>
+    <text x="850" y="232">검증 확인서 발급</text>
+  </g>
+  <g font-size="18" font-style="italic" text-anchor="middle" class="ink">
+    <text x="1058" y="394">10개 업종의</text>
+    <text x="1058" y="421">제조 AI 데이터를</text>
+    <text x="1058" y="448">Croissant 표준</text>
+    <text x="1058" y="475">하나로 수집·관리</text>
+  </g>
+  <g font-size="19" font-style="italic" text-anchor="middle" class="ink">
+    <text x="860" y="1262">Croissant 메타데이터로</text>
+    <text x="860" y="1290">데이터를 바로 불러와</text>
+    <text x="860" y="1318">원하는 ML 프레임워크로</text>
+    <text x="860" y="1346">제조 AI 학습·검증</text>
+  </g>
+
+  <!-- ═════════ ① 제출 기업 ═════════ -->
+  <!-- 상단 아이콘: 표 · 이미지 -->
+  <g transform="translate(250,88)">
+    <rect x="0" y="0" width="44" height="40" rx="4" fill="#fff" stroke="#171726" stroke-width="2.4"/>
+    <rect x="0" y="0" width="44" height="10" rx="3" fill="#171726"/>
+    <path d="M0 20h44M0 30h44M15 10v30M29 10v30" stroke="#171726" stroke-width="1.6"/>
+  </g>
+  <g transform="translate(372,70)">
+    <rect x="0" y="0" width="44" height="40" rx="5" fill="#fff" stroke="#171726" stroke-width="2.4"/>
+    <circle cx="12" cy="12" r="4.5" fill="none" stroke="#171726" stroke-width="2"/>
+    <path d="M4 34 L17 21 L26 29 L32 23 L41 34" fill="none" stroke="#171726" stroke-width="2.2" stroke-linejoin="round"/>
+  </g>
+  <path class="thin" d="M272 128 C 262 150, 250 158, 236 168"/>
+  <path class="thin" d="M394 110 C 400 140, 395 158, 380 170"/>
+
+  <!-- 작성 시트 4개 (Croissant 의 METADATA/RESOURCES/STRUCTURE/SEMANTICS 자리) -->
+  <g font-size="16">
+    <text x="166" y="192"><tspan class="navy" font-weight="800">기본정보</tspan><tspan x="282" class="ink">데이터셋·기업·업종/공정</tspan></text>
+    <text x="166" y="220"><tspan class="navy" font-weight="800">데이터 정보</tspan><tspan x="282" class="ink">데이터 경로·파일 패턴·피처</tspan></text>
+    <text x="166" y="248"><tspan class="navy" font-weight="800">라벨 정보</tspan><tspan x="282" class="ink">라벨 형식·매핑·클래스</tspan></text>
+    <text x="166" y="276"><tspan class="navy" font-weight="800">스플릿 정보</tspan><tspan x="282" class="ink">학습·검증·평가 분할</tspan></text>
+  </g>
+
+  <!-- 데이터 폴더 -->
+  <text x="112" y="336" font-size="14" font-weight="700" class="muted">데이터 폴더</text>
+  <g class="mono" font-size="14">
+    <g transform="translate(110,346)"><use href="#folder" width="22" height="18"/><text x="28" y="14" class="ink">raw/</text></g>
+    <g transform="translate(110,374)"><use href="#folder" width="22" height="18"/><text x="28" y="14" class="ink">processed/</text></g>
+    <g transform="translate(110,402)"><use href="#folder" width="22" height="18"/><text x="28" y="14" class="ink">annotations/</text></g>
+    <g transform="translate(110,430)"><use href="#folder" width="22" height="18"/><text x="28" y="14" class="ink">AImodel/</text></g>
+  </g>
+
+  <!-- 입력 → 도구 연결선 -->
+  <path class="flow" d="M300 288 C 300 312, 312 328, 334 344" marker-end="url(#ah)"/>
+  <path class="flow" d="M246 398 C 270 398, 294 398, 312 398" marker-end="url(#ah)"/>
+
+  <!-- 제출 검증 도구 배지 -->
+  <circle cx="380" cy="398" r="62" fill="#fff" stroke="#171726" stroke-width="6"/>
+  <g transform="translate(380,392)">
+    <path d="M0 -34 L27 -24 V0 C27 19 13 30 0 36 C-13 30 -27 19 -27 0 V-24 Z" fill="#4f46e5"/>
+    <path d="M-12 1 L-3 10 L13 -8" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="380" y="484" text-anchor="middle" font-size="17" font-weight="800" class="ink">제출 검증 도구</text>
+  <text x="380" y="505" text-anchor="middle" font-size="13.5" class="muted">입력값 · 폴더 구조 · 실제 파일 검증</text>
+
+  <!-- 산출물 -->
+  <g transform="translate(255,518)">
+    <rect x="0" y="0" width="250" height="34" rx="8" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
+    <use href="#doc" x="10" y="5" width="19" height="24"/>
+    <text x="38" y="23" font-size="15" class="mono ink">&lt;ID&gt;.jsonld</text>
+    <text x="240" y="23" font-size="12" text-anchor="end" class="muted">Croissant 1.1</text>
+  </g>
+  <g transform="translate(255,558)">
+    <rect x="0" y="0" width="250" height="34" rx="8" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+    <use href="#doc" x="10" y="5" width="19" height="24"/>
+    <text x="38" y="23" font-size="15" font-weight="700" class="ink">제조데이터검증확인서.pdf</text>
+  </g>
+
+  <!-- ═════════ 제출 → M.AX ═════════ -->
+  <path class="flow" d="M442 384 C 600 300, 820 420, 836 658" marker-end="url(#ah)"/>
+  <text x="532" y="316" font-size="20" font-weight="800" class="ink">제출</text>
+  <text x="532" y="336" font-size="12" font-weight="700" letter-spacing="1.5" class="muted">SUBMIT</text>
+
+  <!-- ═════════ ② M.AX 얼라이언스 ═════════ -->
+  <g font-size="16" font-weight="700" text-anchor="middle" class="ink">
+    <g transform="translate(756,578)"><rect class="chip" x="-40" y="-17" width="80" height="34" rx="17" fill="#dbeafe"/><text y="6">기계</text></g>
+    <g transform="translate(936,607)"><rect class="chip" x="-44" y="-17" width="88" height="34" rx="17" fill="#fde68a"/><text y="6">자동차</text></g>
+    <g transform="translate(999,697)"><rect class="chip" x="-36" y="-17" width="72" height="34" rx="17" fill="#bae6fd"/><text y="6">조선</text></g>
+    <g transform="translate(1001,807)"><rect class="chip" x="-36" y="-17" width="72" height="34" rx="17" fill="#fbcfe8"/><text y="6">화학</text></g>
+    <g transform="translate(941,899)"><rect class="chip" x="-50" y="-17" width="100" height="34" rx="17" fill="#bbf7d0"/><text y="6">이차전지</text></g>
+    <g transform="translate(853,940)"><rect class="chip" x="-36" y="-17" width="72" height="34" rx="17" fill="#e5e7eb"/><text y="6">철강</text></g>
+    <g transform="translate(768,936)"><rect class="chip" x="-36" y="-17" width="72" height="34" rx="17" fill="#fed7aa"/><text y="6">가전</text></g>
+    <g transform="translate(640,810)"><rect class="chip" x="-44" y="-17" width="88" height="34" rx="17" fill="#ddd6fe"/><text y="6">반도체</text></g>
+    <g transform="translate(637,713)"><rect class="chip" x="-40" y="-17" width="80" height="34" rx="17" fill="#ccfbf1"/><text y="6">바이오</text></g>
+    <g transform="translate(680,629)"><rect class="chip" x="-36" y="-17" width="72" height="34" rx="17" fill="#fecaca"/><text y="6">섬유</text></g>
+  </g>
+  <circle cx="820" cy="755" r="92" fill="#fff" stroke="#171726" stroke-width="6"/>
+  <image href="logo.png" x="758" y="712" width="124" height="43"/>
+  <text x="820" y="782" text-anchor="middle" font-size="15" font-weight="800" class="ink">제조 AI 데이터</text>
+  <text x="820" y="802" text-anchor="middle" font-size="13" class="muted">업종 · 공정별 수집</text>
+
+  <!-- ═════════ M.AX → 활용 ═════════ -->
+  <path class="flow" d="M755 822 C 700 990, 580 1090, 448 1140" marker-end="url(#ah)"/>
+  <text x="690" y="1082" font-size="19" font-weight="800" class="ink">검색 · 다운로드</text>
+  <text x="690" y="1102" font-size="12" font-weight="700" letter-spacing="1.5" class="muted">SEARCH &amp; DOWNLOAD</text>
+
+  <!-- ═════════ ③ 데이터 활용 ═════════ -->
+  <circle cx="380" cy="1160" r="62" fill="#fff" stroke="#171726" stroke-width="6"/>
+  <text x="380" y="1157" text-anchor="middle" font-size="30" font-weight="800" class="indigo mono">{ }</text>
+  <text x="380" y="1180" text-anchor="middle" font-size="13" font-weight="700" class="navy mono">.jsonld</text>
+  <text x="380" y="1246" text-anchor="middle" font-size="16" font-weight="800" class="ink">mlcroissant 로 로드</text>
+
+  <!-- 프레임워크 (이름만, 로고 없음) -->
+  <g font-size="21" font-weight="700" class="ink">
+    <text x="156" y="992">TensorFlow</text>
+    <text x="118" y="1090">PyTorch</text>
+    <text x="104" y="1190">JAX</text>
+    <text x="150" y="1290">Keras</text>
+  </g>
+  <path class="flow" d="M340 1112 C 320 1060, 290 1025, 262 1004" marker-end="url(#ah)"/>
+  <path class="flow" d="M320 1142 C 290 1110, 262 1092, 214 1086" marker-end="url(#ah)"/>
+  <path class="flow" d="M318 1168 C 260 1178, 210 1184, 154 1184" marker-end="url(#ah)"/>
+  <path class="flow" d="M326 1192 C 300 1240, 270 1262, 222 1276" marker-end="url(#ah)"/>
+  <text x="452" y="1206" font-size="17" font-weight="800" class="ink">학습</text>
+  <text x="452" y="1224" font-size="12" font-weight="700" letter-spacing="1.5" class="muted">USE</text>
+
+  <!-- 활용 예 -->
+  <g font-size="15" text-anchor="middle" class="muted">
+    <text x="360" y="1335">불량 검출 · 이상 탐지 · 공정 최적화 등</text>
+    <text x="360" y="1357">제조 AI 모델 개발</text>
+  </g>
+</svg>
+</body></html>
