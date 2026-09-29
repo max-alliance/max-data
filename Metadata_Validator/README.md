@@ -9,11 +9,11 @@ M.AX 얼라이언스에 제출할 **제조 AI 데이터를 검사하고, 제출 
 
 ## 다운로드
 
-[![최신 버전](https://img.shields.io/github/v/release/OWNER/REPO?label=%EC%B5%9C%EC%8B%A0%20%EB%B2%84%EC%A0%84)](https://github.com/OWNER/REPO/releases/latest)
+[![최신 버전](https://img.shields.io/github/v/release/max-alliance/max-data?label=%EC%B5%9C%EC%8B%A0%20%EB%B2%84%EC%A0%84)](https://github.com/max-alliance/max-data/releases/latest)
 
-**[⬇ 최신 버전 설치 파일 받기](https://github.com/OWNER/REPO/releases/latest)** — 페이지 아래 *Assets*에서 `metadata_validator-Setup-<버전>.exe`를 내려받으세요.
+**[⬇ 최신 버전 설치 파일 받기](https://github.com/max-alliance/max-data/releases/latest)** — 페이지 아래 *Assets*에서 `metadata_validator-Setup-<버전>.exe`를 내려받으세요.
 
-- 이전 버전과 버전별 변경 내용: [전체 릴리스 목록](https://github.com/OWNER/REPO/releases)
+- 이전 버전과 버전별 변경 내용: [전체 릴리스 목록](https://github.com/max-alliance/max-data/releases)
 - Windows 10/11용입니다.
 
 ## 데이터 제출 흐름
